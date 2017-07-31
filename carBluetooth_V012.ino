@@ -1,72 +1,111 @@
-//*** 1- Documentation
-//This program is used to control a robot car using a app that communicates with Arduino trough a bluetooth module
-
-#include <AFMotor.h>
-#include <Servo.h>
-//creates two objects to control the terminal 3 and 4 of motor shield
-AF_DCMotor motor1(1);
-Servo myServo;
-int angle = 11;
+/*
+Управление машинкой на ардуино, через блютуз модуль HC05 */
 char command;
+int FrontLights = 13; //К 13 пину припаяны светодиоды для света фар
 
+// Переменные для контактов драйвера двигателей
+int IN1 = 11; 
+int IN2 = 12;
+int IN3 = 9;
+int IN4 = 10;
 void setup()
 {
-  myServo.attach(10);
-  Serial.begin(9600);  //Set the baud rate to your Bluetooth module.
+  Serial.begin(9600);  //Устанавливаем скорость передачи для блютуз модуля
+  pinMode(FrontLights, OUTPUT);
+
+  pinMode (IN4, OUTPUT);
+  pinMode (IN4, OUTPUT);
 }
 
-void loop() {
+
+ void loop() {
   if (Serial.available() > 0) {
     command = Serial.read();
-    Stop(); //initialize with motors stoped
-    //Change pin mode only if new command is different from previous.
-    //Serial.println(command);
+    Stop(); //при запуске моторы остановлены
+
     switch (command) {
-      case 'F':
+      case 'F'://Двигаться прямо
         forward();
-        break;
-      case 'B':
+      break;
+      case 'B'://Двигаться назад
         back();
-        break;
-      case 'L':
+      break;
+      case 'L'://Повернуть колеса влево
         left();
-        break;
-      case 'R':
+      break;
+      case 'R'://Повернуть колеса вправо
         right();
-        break;
+      break;
+      case 'G'://Вперед и вправо
+      forwardRight();
+      break;
+      case 'I'://Вперед и влево
+      forwardLeft();
+      break;
+      case 'H'://Назад и вправо
+      backRight();
+      break;
+      case 'J'://назад и влево
+      backLeft();
+      break;  
+      case 'W': //Включить передние фары
+        digitalWrite(FrontLights, HIGH);
+      break;
+      case 'w'://Выключить передние фары
+        digitalWrite(FrontLights, LOW);
+      break;
     }
   }
 }
 
 void forward()
 {
-  motor1.setSpeed(255); //Define maximum velocity
-  motor1.run(FORWARD); //rotate the motor clockwise
+  digitalWrite (IN4, LOW);
+  digitalWrite (IN3, HIGH); 
 }
 
 void back()
 {
-  motor1.setSpeed(255);
-  motor1.run(BACKWARD); //rotate the motor counterclockwise
+  digitalWrite (IN4, HIGH);
+  digitalWrite (IN3, LOW);
 }
 
 void left()
 {
-  for (angle = 0; angle < 160; angle += 10)
-  {
-    myServo.write(angle);
-  }
+  digitalWrite (IN1, HIGH);
+  digitalWrite (IN2, LOW);
 }
 
 void right()
 {
-  for (angle = 160; angle >= 30; angle -= 10) {
-    myServo.write(angle);
-  }
+  digitalWrite (IN1, LOW);
+  digitalWrite (IN2, HIGH); 
 }
 
+void forwardLeft()
+{
+forward();
+right();
+}
+void forwardRight()
+{
+  forward();
+  left();
+}
+void backLeft()
+{
+back();
+right();
+}
+ void backRight() 
+ {
+back();
+left();
+}
 void Stop()
 {
-  motor1.setSpeed(0);
-  motor1.run(RELEASE); //turn motor1 off
+  digitalWrite (IN3, LOW); 
+  digitalWrite (IN4, LOW); 
+  digitalWrite (IN2, LOW); 
+  digitalWrite (IN1, LOW); 
 }
