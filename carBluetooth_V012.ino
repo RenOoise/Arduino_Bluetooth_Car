@@ -1,7 +1,7 @@
 /*
 Управление машинкой на ардуино, через блютуз модуль HC05
 Версия 1.2
-Автор RenOoise / http://dumb-engineer.ru */
+Автор RenOoise / http://sysengineer.ru */
 char command;
 int FrontLights = 13; //К 13 пину припаяны светодиоды для света фар
 
